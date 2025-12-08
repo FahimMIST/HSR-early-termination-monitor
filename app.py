@@ -5,7 +5,34 @@ import requests
 import pandas as pd
 import streamlit as st
 
-SLACK_WEBHOOK_URL = st.secrets.get("SLACK_WEBHOOK_URL", os.getenv("SLACK_WEBHOOK_URL"))
+# Config helper to load secrets/env
+def get_config_value(key: str, default: str | None = None) -> str | None:
+    """
+    Load configuration / secrets in a way that works both:
+      - locally / Streamlit (st.secrets + .env)
+      - GitHub Actions / other CLIs (environment variables only)
+    """
+    # 1. Prefer environment variables (GitHub Actions, Render, etc.)
+    val = os.getenv(key)
+    if val:
+        return val
+
+    # 2. Fall back to Streamlit secrets if available
+    try:
+        if hasattr(st, "secrets") and key in st.secrets:
+            return st.secrets[key]
+    except Exception:
+        # No secrets.toml or cannot parse; ignore and use default
+        pass
+
+    return default
+
+
+# Global configuration values
+FTC_API_KEY = get_config_value("FTC_API_KEY")
+BREVO_API_KEY = get_config_value("BREVO_API_KEY")
+ALERT_EMAIL_TO = get_config_value("ALERT_EMAIL_TO")
+SLACK_WEBHOOK_URL = get_config_value("SLACK_WEBHOOK_URL")
 from sib_api_v3_sdk import Configuration, ApiClient
 from sib_api_v3_sdk.api.transactional_emails_api import TransactionalEmailsApi
 from sib_api_v3_sdk.models.send_smtp_email import SendSmtpEmail
@@ -36,8 +63,9 @@ ALERT_TEMPLATE_FILE = os.path.join(TEMPLATE_DIR, "hsr_alert_email.html")
 SLACK_TEMPLATE_FILE = os.path.join(TEMPLATE_DIR, "hsr_slack_item.txt")
 
 # Brevo email config (optional, used if configured)
-BREVO_API_KEY = st.secrets.get("BREVO_API_KEY", os.getenv("BREVO_API_KEY"))
-ALERT_EMAIL_TO = st.secrets.get("ALERT_EMAIL_TO", os.getenv("ALERT_EMAIL_TO"))
+# Values are already loaded via get_config_value at the top:
+#   BREVO_API_KEY
+#   ALERT_EMAIL_TO
 
 
 def render_hsr_email_html(new_items: pd.DataFrame) -> tuple[str, str]:
@@ -267,17 +295,15 @@ def save_subscribers(subscribers: list[dict]) -> None:
         pass
 
 
-# Load API key from Streamlit secrets (preferred) or env
-API_KEY = st.secrets.get("FTC_API_KEY", os.getenv("FTC_API_KEY"))
-
-if not API_KEY:
-    raise RuntimeError("FTC API key not found. Set `FTC_API_KEY` in .streamlit/secrets.toml or environment.")
+# Ensure FTC API key is configured
+if not FTC_API_KEY:
+    raise RuntimeError("FTC API key not found. Set `FTC_API_KEY` as an environment variable or in .streamlit/secrets.toml.")
 
 
 @st.cache_data(ttl=60)  # cache for 60 seconds to avoid hitting rate limits too hard
 def fetch_hsr_notices(title_keyword: str | None, date_filter: str | None, limit: int = 50):
     params = {
-        "api_key": API_KEY,
+        "api_key": FTC_API_KEY,
         "sort[created][path]": "created",
         "sort[created][direction]": "DESC",
         "page[limit]": str(limit),
