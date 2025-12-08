@@ -235,42 +235,80 @@ try:
                 lambda x: f'<a href="{x}" target="_blank">Open Filing</a>' if pd.notna(x) and x else ""
             )
 
-        # Styled HTML table with sticky header and alternating row colors
+        # Styled HTML table with sticky header and alternating row colors, theme-aware
         table_html = df_table.to_html(escape=False, index=False, classes="hsr-table")
 
-        st.markdown(
-            """
-            <style>
-            .hsr-table-container {
-                max-height: 600px;
-                overflow-y: auto;
-                border: 1px solid #eee;
-                border-radius: 4px;
-            }
-            .hsr-table-container table {
-                border-collapse: collapse;
-                width: 100%;
-            }
-            .hsr-table-container thead th {
-                position: sticky;
-                top: 0;
-                background-color: #ffffff;
-                z-index: 1;
-                text-align: left;
-            }
-            .hsr-table-container tbody tr:nth-child(odd) {
-                background-color: #fafafa;
-            }
-            .hsr-table-container tbody tr:nth-child(even) {
-                background-color: #ffffff;
-            }
-            .hsr-table-container tbody tr:hover {
-                background-color: #f0f0f5;
-            }
-            </style>
-            """,
-            unsafe_allow_html=True,
-        )
+        # Detect Streamlit base theme (light or dark) and choose colors accordingly
+        theme_base = st.get_option("theme.base") or "light"
+        if theme_base.lower() == "dark":
+            header_bg = "#111827"
+            header_text = "#e5e7eb"
+            border_color = "#111827"
+            row_odd = "#020617"
+            row_even = "#0b1120"
+            row_hover = "#1f2937"
+            cell_text = "#e5e7eb"
+            link_color = "#60a5fa"
+        else:
+            # Light theme palette
+            header_bg = "#f3f4f6"
+            header_text = "#111827"
+            border_color = "#e5e7eb"
+            row_odd = "#ffffff"
+            row_even = "#f9fafb"
+            row_hover = "#e5e7eb"
+            cell_text = "#111827"
+            link_color = "#2563eb"
+
+        table_css = f"""
+        <style>
+        .hsr-table-container {{
+            max-height: 600px;
+            overflow-y: auto;
+            border: 1px solid {border_color};
+            border-radius: 6px;
+        }}
+        .hsr-table-container table {{
+            border-collapse: collapse;
+            width: 100%;
+            font-size: 0.9rem;
+        }}
+        .hsr-table-container thead th {{
+            position: sticky;
+            top: 0;
+            background-color: {header_bg};
+            color: {header_text};
+            z-index: 2;
+            text-align: left;
+            padding: 0.6rem 0.75rem;
+            border-bottom: 1px solid {border_color};
+        }}
+        .hsr-table-container tbody td {{
+            padding: 0.55rem 0.75rem;
+            border-bottom: 1px solid {border_color};
+            color: {cell_text};
+        }}
+        .hsr-table-container tbody tr:nth-child(odd) {{
+            background-color: {row_odd};
+        }}
+        .hsr-table-container tbody tr:nth-child(even) {{
+            background-color: {row_even};
+        }}
+        .hsr-table-container tbody tr:hover {{
+            background-color: {row_hover};
+        }}
+        .hsr-table-container a {{
+            color: {link_color};
+            text-decoration: none;
+            font-weight: 500;
+        }}
+        .hsr-table-container a:hover {{
+            text-decoration: underline;
+        }}
+        </style>
+        """
+
+        st.markdown(table_css, unsafe_allow_html=True)
 
         st.markdown(
             f'<div class="hsr-table-container">{table_html}</div>',
