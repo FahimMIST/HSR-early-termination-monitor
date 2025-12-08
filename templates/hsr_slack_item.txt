@@ -1,0 +1,7 @@
+*{title}*
+📅 *Date:* {date}
+🎯 *Target:* {target}
+🏢 *Acquirer:* {acquirer}
+📘 *HSR Status:* Early Termination Granted
+
+🔗 {link}
