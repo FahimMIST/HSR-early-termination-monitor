@@ -1,67 +1,68 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8" />
-  <title>HSR Early Termination Alerts</title>
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: #111827;
-      background-color: #f9fafb;
-      line-height: 1.5;
-    }
-    .wrapper {
-      max-width: 640px;
-      margin: 0 auto;
-      padding: 24px 16px;
-      background: #ffffff;
-      border-radius: 8px;
-      border: 1px solid #e5e7eb;
-    }
-    h1, h2 {
-      color: #111827;
-    }
-    .header {
-      border-bottom: 1px solid #e5e7eb;
-      padding-bottom: 12px;
-      margin-bottom: 16px;
-    }
-    .deal-list {
-      padding-left: 20px;
-    }
-    .deal-list li {
-      margin-bottom: 12px;
-    }
-    .meta {
-      font-size: 13px;
-      color: #6b7280;
-      margin-top: 16px;
-    }
-    a {
-      color: #2563eb;
-      text-decoration: none;
-    }
-    a:hover {
-      text-decoration: underline;
-    }
-  </style>
-</head>
-<body>
-  <div class="wrapper">
-    <div class="header">
-      <h2>HSR Early Termination Monitor</h2>
-      <p>{count} new early termination notice(s) since your last visit.</p>
+  <head>
+    <meta charset="utf-8" />
+    <title>HSR Early Termination Alerts</title>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: #111827;
+        background-color: #f9fafb;
+        line-height: 1.5;
+      }
+      .wrapper {
+        max-width: 640px;
+        margin: 0 auto;
+        padding: 24px 16px;
+        background: #ffffff;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+      }
+      h1,
+      h2 {
+        color: #111827;
+      }
+      .header {
+        border-bottom: 1px solid #e5e7eb;
+        padding-bottom: 12px;
+        margin-bottom: 16px;
+      }
+      .deal-list {
+        padding-left: 20px;
+      }
+      .deal-list li {
+        margin-bottom: 12px;
+      }
+      .meta {
+        font-size: 13px;
+        color: #6b7280;
+        margin-top: 16px;
+      }
+      a {
+        color: #2563eb;
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrapper">
+      <div class="header">
+        <h2>HSR Early Termination Monitor</h2>
+        <p>$count new early termination notice(s) since your last visit.</p>
+      </div>
+
+      <p>New notices:</p>
+      <ul class="deal-list">
+        $items
+      </ul>
+
+      <p class="meta">
+        You are receiving this update from your HSR Early Termination Monitor
+        app. To change alert behavior, adjust settings in the Streamlit sidebar.
+      </p>
     </div>
-
-    <p>New notices:</p>
-    <ul class="deal-list">
-      {items}
-    </ul>
-
-    <p class="meta">
-      You are receiving this update from your HSR Early Termination Monitor app.
-      To change alert behavior, adjust settings in the Streamlit sidebar.
-    </p>
-  </div>
-</body>
+  </body>
 </html>
