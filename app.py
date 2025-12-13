@@ -4,6 +4,7 @@ from datetime import datetime
 import requests
 import pandas as pd
 import streamlit as st
+from string import Template
 
 # Config helper to load secrets/env
 def get_config_value(key: str, default: str | None = None) -> str | None:
@@ -71,7 +72,7 @@ SLACK_TEMPLATE_FILE = os.path.join(TEMPLATE_DIR, "hsr_slack_item.txt")
 def render_hsr_email_html(new_items: pd.DataFrame) -> tuple[str, str]:
     """
     Render the HSR alert email HTML using a template file if present.
-    The template should use {count} and {items} placeholders.
+    The template should use $count and $items placeholders.
     """
     count = len(new_items)
 
@@ -94,14 +95,14 @@ def render_hsr_email_html(new_items: pd.DataFrame) -> tuple[str, str]:
     except FileNotFoundError:
         # Simple fallback template if file is missing
         template = """
-        <h2>{count} new HSR early termination notice(s)</h2>
+        <h2>$count new HSR early termination notice(s)</h2>
         <p>The following notices are new since the last alert:</p>
         <ul>
-        {items}
+        $items
         </ul>
         """
 
-    html = template.format(count=count, items=items_html)
+    html = Template(template).safe_substitute(count=count, items=items_html)
     subject = f"{count} new HSR early termination notice(s)"
     return subject, html
 
