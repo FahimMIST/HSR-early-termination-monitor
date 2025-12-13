@@ -2,8 +2,8 @@ name: HSR Early Termination Monitor
 
 on:
   schedule:
-    - cron: "*/5 * * * *"   # Runs every 5 minutes
-  workflow_dispatch:        # Allow manual trigger
+    - cron: "*/5 * * * *" # Runs every 5 minutes
+  workflow_dispatch: # Allow manual trigger
 
 jobs:
   monitor:
@@ -12,6 +12,14 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Restore last-visit state
+        uses: actions/cache@v4
+        with:
+          path: hsr_last_visit.json
+          key: hsr-last-visit-${{ github.run_id }}
+          restore-keys: |
+            hsr-last-visit-
 
       - name: Set up Python
         uses: actions/setup-python@v4

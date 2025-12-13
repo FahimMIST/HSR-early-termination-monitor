@@ -150,8 +150,15 @@ def render_slack_payload(new_items: pd.DataFrame) -> dict:
         {"type": "divider"},
     ]
 
-    # Limit to first 10 items in the Slack message for readability
-    for _, row in new_items.head(10).iterrows():
+    # Slack Block Kit has limits (max 50 blocks per message). We reserve 3 blocks
+    # for header/intro/divider, so we can include up to 47 item sections. Keep a
+    # small buffer and cap at 45 items.
+    max_items = 45
+    shown = 0
+
+    for _, row in new_items.iterrows():
+        if shown >= max_items:
+            break
         date_val = row.get("date") or ""
         title_val = row.get("title") or ""
         acquirer_val = row.get("acquirer") or "N/A"
@@ -177,15 +184,16 @@ def render_slack_payload(new_items: pd.DataFrame) -> dict:
                 },
             }
         )
+        shown += 1
 
-    if count_new > 10:
+    if count_new > shown:
         blocks.append(
             {
                 "type": "context",
                 "elements": [
                     {
                         "type": "mrkdwn",
-                        "text": f"...and {count_new - 10} more new notice(s).",
+                        "text": f"...and {count_new - shown} more new notice(s).",
                     }
                 ],
             }
